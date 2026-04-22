@@ -1,0 +1,8 @@
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "bluegrid-devops-task-gh-deploy-20260422163602299900000006",
+            "PolicyArn": "arn:aws:iam::018491521563:policy/bluegrid-devops-task-gh-deploy-20260422163602299900000006"
+        }
+    ]
+}

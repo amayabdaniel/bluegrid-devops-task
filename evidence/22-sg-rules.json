@@ -1,0 +1,174 @@
+{
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-05a165f602c6164fb",
+            "GroupId": "sg-0309b84ad37145ecb",
+            "GroupOwnerId": "018491521563",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIpv4": "186.98.66.197/32",
+            "Description": "SSH from admin only",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "bluegrid-devops-task"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "demo"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "daniel-amaya"
+                },
+                {
+                    "Key": "Repository",
+                    "Value": "amayabdaniel/bluegrid-devops-task"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                }
+            ],
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:018491521563:security-group-rule/sgr-05a165f602c6164fb"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-0cdb0b4a86273c5bf",
+            "GroupId": "sg-0309b84ad37145ecb",
+            "GroupOwnerId": "018491521563",
+            "IsEgress": true,
+            "IpProtocol": "udp",
+            "FromPort": 123,
+            "ToPort": 123,
+            "CidrIpv4": "0.0.0.0/0",
+            "Description": "NTP for clock sync",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "bluegrid-devops-task"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "demo"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "daniel-amaya"
+                },
+                {
+                    "Key": "Repository",
+                    "Value": "amayabdaniel/bluegrid-devops-task"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                }
+            ],
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:018491521563:security-group-rule/sgr-0cdb0b4a86273c5bf"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-0455aa9c947b07147",
+            "GroupId": "sg-0309b84ad37145ecb",
+            "GroupOwnerId": "018491521563",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 777,
+            "ToPort": 777,
+            "CidrIpv4": "0.0.0.0/0",
+            "Description": "gs-rest-service public",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "bluegrid-devops-task"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "demo"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "daniel-amaya"
+                },
+                {
+                    "Key": "Repository",
+                    "Value": "amayabdaniel/bluegrid-devops-task"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                }
+            ],
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:018491521563:security-group-rule/sgr-0455aa9c947b07147"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-0a5a289276654009c",
+            "GroupId": "sg-0309b84ad37145ecb",
+            "GroupOwnerId": "018491521563",
+            "IsEgress": true,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIpv4": "0.0.0.0/0",
+            "Description": "HTTPS to anywhere (image pulls, SSM, Slack, updates)",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "bluegrid-devops-task"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "demo"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "daniel-amaya"
+                },
+                {
+                    "Key": "Repository",
+                    "Value": "amayabdaniel/bluegrid-devops-task"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                }
+            ],
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:018491521563:security-group-rule/sgr-0a5a289276654009c"
+        },
+        {
+            "SecurityGroupRuleId": "sgr-0281d7c5d0bb6e4bc",
+            "GroupId": "sg-0309b84ad37145ecb",
+            "GroupOwnerId": "018491521563",
+            "IsEgress": true,
+            "IpProtocol": "udp",
+            "FromPort": 53,
+            "ToPort": 53,
+            "CidrIpv4": "0.0.0.0/0",
+            "Description": "DNS resolution",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "bluegrid-devops-task"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "demo"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "daniel-amaya"
+                },
+                {
+                    "Key": "Repository",
+                    "Value": "amayabdaniel/bluegrid-devops-task"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                }
+            ],
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:018491521563:security-group-rule/sgr-0281d7c5d0bb6e4bc"
+        }
+    ]
+}

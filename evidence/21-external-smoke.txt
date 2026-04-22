@@ -1,0 +1,30 @@
+# /greeting externally via public IP 100.26.229.108:777
+## default call
+{"id":2,"content":"Hello, World!"}
+http_code=200
+time_total=0.196407s
+
+## with name param
+{"id":3,"content":"Hello, Daniel!"}
+http_code=200
+time_total=0.178556s
+
+## 10-sample latency
+  sample=0.182654
+  sample=0.183282
+  sample=0.177754
+  sample=0.185524
+  sample=0.180189
+  sample=0.184284
+  sample=0.179057
+  sample=0.193391
+  sample=0.182393
+  sample=0.184990
+  mean=0.183352s  max=0.193391s
+
+## /actuator NOT exposed publicly (must be 404)
+http_code=404
+
+## /actuator NOT exposed on 8081 publicly (must time out or be refused)
+http_code=000
+blocked as expected

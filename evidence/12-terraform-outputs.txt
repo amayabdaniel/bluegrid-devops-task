@@ -1,0 +1,7 @@
+github_deploy_role_arn = "arn:aws:iam::018491521563:role/bluegrid-devops-task-gh-deploy-20260422163516754700000003"
+instance_id = "i-067121bcd94ec70c1"
+public_dns = "ec2-100-26-229-108.compute-1.amazonaws.com"
+public_ip = "100.26.229.108"
+security_group_id = "sg-0309b84ad37145ecb"
+service_url = "http://100.26.229.108:777/greeting"
+ssh_command = "ssh deploy@100.26.229.108"

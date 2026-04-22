@@ -1,0 +1,37 @@
+{
+    "PolicyVersion": {
+        "Document": {
+            "Statement": [
+                {
+                    "Action": "ssm:SendCommand",
+                    "Effect": "Allow",
+                    "Resource": [
+                        "arn:aws:ssm:us-east-1::document/AWS-RunShellScript",
+                        "arn:aws:ec2:us-east-1:018491521563:instance/i-067121bcd94ec70c1"
+                    ],
+                    "Sid": "InvokeShellScriptOnThisHost"
+                },
+                {
+                    "Action": [
+                        "ssm:ListCommandInvocations",
+                        "ssm:GetCommandInvocation",
+                        "ssm:DescribeInstanceInformation"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "*",
+                    "Sid": "PollCommandResults"
+                },
+                {
+                    "Action": "ec2:DescribeInstances",
+                    "Effect": "Allow",
+                    "Resource": "*",
+                    "Sid": "ReadInstance"
+                }
+            ],
+            "Version": "2012-10-17"
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-04-22T16:36:02+00:00"
+    }
+}

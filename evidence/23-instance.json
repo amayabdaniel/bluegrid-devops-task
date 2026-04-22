@@ -1,0 +1,189 @@
+{
+    "Reservations": [
+        {
+            "ReservationId": "r-0598f6f9263f9f02e",
+            "OwnerId": "018491521563",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2026-04-22T16:35:29+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-0b3170e4b514f9d7c",
+                                "EbsCardIndex": 0
+                            }
+                        }
+                    ],
+                    "ClientToken": "terraform-20260422163523497900000005",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::018491521563:instance-profile/bluegrid-devops-task-ec2-20260422163516986200000004",
+                        "Id": "AIPAQITROHINWE4CU4LBG"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Association": {
+                                "IpOwnerId": "amazon",
+                                "PublicDnsName": "ec2-100-26-229-108.compute-1.amazonaws.com",
+                                "PublicIp": "100.26.229.108"
+                            },
+                            "Attachment": {
+                                "AttachTime": "2026-04-22T16:35:28+00:00",
+                                "AttachmentId": "eni-attach-0fae7a866c2fe02c9",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-0309b84ad37145ecb",
+                                    "GroupName": "bluegrid-devops-task-sg"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "06:02:e7:7c:b4:d9",
+                            "NetworkInterfaceId": "eni-0355c8e54333b1ed8",
+                            "OwnerId": "018491521563",
+                            "PrivateDnsName": "ip-172-31-54-48.ec2.internal",
+                            "PrivateIpAddress": "172.31.54.48",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Association": {
+                                        "IpOwnerId": "amazon",
+                                        "PublicDnsName": "ec2-100-26-229-108.compute-1.amazonaws.com",
+                                        "PublicIp": "100.26.229.108"
+                                    },
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-54-48.ec2.internal",
+                                    "PrivateIpAddress": "172.31.54.48"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-0786e406ea271d705",
+                            "VpcId": "vpc-0bc68732136df3c42",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-0309b84ad37145ecb",
+                            "GroupName": "bluegrid-devops-task-sg"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "Project",
+                            "Value": "bluegrid-devops-task"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "bluegrid-devops-task-host"
+                        },
+                        {
+                            "Key": "ManagedBy",
+                            "Value": "terraform"
+                        },
+                        {
+                            "Key": "Repository",
+                            "Value": "amayabdaniel/bluegrid-devops-task"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "demo"
+                        },
+                        {
+                            "Key": "Owner",
+                            "Value": "daniel-amaya"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-04-22T16:35:28+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "SecondaryInterfaces": [],
+                    "InstanceId": "i-067121bcd94ec70c1",
+                    "ImageId": "ami-098e39bafa7e7303d",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-172-31-54-48.ec2.internal",
+                    "PublicDnsName": "ec2-100-26-229-108.compute-1.amazonaws.com",
+                    "StateTransitionReason": "",
+                    "KeyName": "bluegrid-devops-task-20260422163516118400000001",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2026-04-22T16:35:28+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az3",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1e"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-0786e406ea271d705",
+                    "VpcId": "vpc-0bc68732136df3c42",
+                    "PrivateIpAddress": "172.31.54.48",
+                    "PublicIpAddress": "100.26.229.108"
+                }
+            ]
+        }
+    ]
+}

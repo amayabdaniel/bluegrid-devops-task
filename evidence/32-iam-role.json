@@ -1,0 +1,57 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "bluegrid-devops-task-gh-deploy-20260422163516754700000003",
+        "RoleId": "AROAQITROHIN4PFDNQ5OA",
+        "Arn": "arn:aws:iam::018491521563:role/bluegrid-devops-task-gh-deploy-20260422163516754700000003",
+        "CreateDate": "2026-04-22T16:35:16+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Federated": "arn:aws:iam::018491521563:oidc-provider/token.actions.githubusercontent.com"
+                    },
+                    "Action": "sts:AssumeRoleWithWebIdentity",
+                    "Condition": {
+                        "StringEquals": {
+                            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                        },
+                        "StringLike": {
+                            "token.actions.githubusercontent.com:sub": [
+                                "repo:amayabdaniel/bluegrid-devops-task:ref:refs/heads/master",
+                                "repo:amayabdaniel/bluegrid-devops-task:ref:refs/heads/develop"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "Description": "Assumed by GitHub Actions CD via OIDC. Scoped to amayabdaniel/bluegrid-devops-task.",
+        "MaxSessionDuration": 3600,
+        "Tags": [
+            {
+                "Key": "Repository",
+                "Value": "amayabdaniel/bluegrid-devops-task"
+            },
+            {
+                "Key": "Environment",
+                "Value": "demo"
+            },
+            {
+                "Key": "ManagedBy",
+                "Value": "terraform"
+            },
+            {
+                "Key": "Owner",
+                "Value": "daniel-amaya"
+            },
+            {
+                "Key": "Project",
+                "Value": "bluegrid-devops-task"
+            }
+        ],
+        "RoleLastUsed": {}
+    }
+}

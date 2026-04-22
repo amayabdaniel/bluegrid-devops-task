@@ -1,0 +1,41 @@
+Installed:
+  container-selinux-4:2.245.0-1.amzn2023.noarch                                 
+  containerd-2.2.1-1.amzn2023.0.2.x86_64                                        
+  dnf-automatic-4.14.0-1.amzn2023.0.6.noarch                                    
+  docker-25.0.14-1.amzn2023.0.3.x86_64                                          
+  esmtp-1.2-17.amzn2023.0.2.x86_64                                              
+  fail2ban-1.1.0-1.amzn2023.0.1.noarch                                          
+  fail2ban-firewalld-1.1.0-1.amzn2023.0.1.noarch                                
+  fail2ban-selinux-1.1.0-1.amzn2023.0.1.noarch                                  
+  fail2ban-sendmail-1.1.0-1.amzn2023.0.1.noarch                                 
+  fail2ban-server-1.1.0-1.amzn2023.0.1.noarch                                   
+  firewalld-1.2.3-1.amzn2023.noarch                                             
+  firewalld-filesystem-1.2.3-1.amzn2023.noarch                                  
+  gobject-introspection-1.82.0-1.amzn2023.x86_64                                
+  ipset-7.11-1.amzn2023.0.3.x86_64                                              
+  ipset-libs-7.11-1.amzn2023.0.3.x86_64                                         
+  iptables-libs-1.8.8-3.amzn2023.0.2.x86_64                                     
+  iptables-nft-1.8.8-3.amzn2023.0.2.x86_64                                      
+  libcap-ng-python3-0.8.2-4.amzn2023.0.2.x86_64                                 
+  libcgroup-3.0-1.amzn2023.0.1.x86_64                                           
+  libesmtp-1.0.6-25.amzn2023.0.2.x86_64                                         
+  liblockfile-1.14-7.amzn2023.0.2.x86_64                                        
+  libnetfilter_conntrack-1.0.8-2.amzn2023.0.2.x86_64                            
+  libnfnetlink-1.0.1-19.amzn2023.0.2.x86_64                                     
+  libnftnl-1.2.2-2.amzn2023.0.2.x86_64                                          
+  nftables-1:1.0.4-3.amzn2023.0.2.x86_64                                        
+  pigz-2.5-1.amzn2023.0.3.x86_64                                                
+  python3-firewall-1.2.3-1.amzn2023.noarch                                      
+  python3-gobject-base-3.48.2-3.amzn2023.0.2.x86_64                             
+  python3-nftables-1:1.0.4-3.amzn2023.0.2.x86_64                                
+  runc-1.3.4-3.amzn2023.0.2.x86_64                                              
+
+Complete!
+Created symlink /etc/systemd/system/timers.target.wants/dnf-automatic.timer → /usr/lib/systemd/system/dnf-automatic.timer.
+Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /usr/lib/systemd/system/docker.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/fail2ban.service → /usr/lib/systemd/system/fail2ban.service.
+[gs-deploy] image=ghcr.io/amayabdaniel/gs-rest-service:master host=777 -> container=8080
+Error response from daemon: Head "https://ghcr.io/v2/amayabdaniel/gs-rest-service/manifests/master": denied
+[userdata] initial deploy failed (non-fatal; CD workflow will retry)
+[userdata] complete 2026-04-22T16:37:24+00:00
+

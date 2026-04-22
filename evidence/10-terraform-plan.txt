@@ -1,0 +1,660 @@
+[0m[1mdata.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mdata.aws_ssm_parameter.al2023_ami: Reading...[0m[0m
+[0m[1mdata.aws_vpc.default: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.ec2_assume: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.ec2_assume: Read complete after 0s [id=2851119427][0m
+[0m[1mdata.aws_caller_identity.current: Read complete after 0s [id=018491521563][0m
+[0m[1mdata.aws_ssm_parameter.al2023_ami: Read complete after 0s [id=/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64][0m
+[0m[1mdata.aws_vpc.default: Read complete after 1s [id=vpc-0bc68732136df3c42][0m
+[0m[1mdata.aws_subnets.default: Reading...[0m[0m
+[0m[1mdata.aws_subnets.default: Read complete after 0s [id=us-east-1][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+ [36m<=[0m read (data resources)[0m
+
+Terraform will perform the following actions:
+
+[1m  # data.aws_iam_policy_document.github_assume[0m will be read during apply
+  # (config refers to values not yet known)
+[0m [36m<=[0m[0m data "aws_iam_policy_document" "github_assume" {
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m json          = (known after apply)
+      [32m+[0m[0m minified_json = (known after apply)
+
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions = [
+              [32m+[0m[0m "sts:AssumeRoleWithWebIdentity",
+            ]
+          [32m+[0m[0m effect  = "Allow"
+
+          [32m+[0m[0m condition {
+              [32m+[0m[0m test     = "StringEquals"
+              [32m+[0m[0m values   = [
+                  [32m+[0m[0m "sts.amazonaws.com",
+                ]
+              [32m+[0m[0m variable = "token.actions.githubusercontent.com:aud"
+            }
+          [32m+[0m[0m condition {
+              [32m+[0m[0m test     = "StringLike"
+              [32m+[0m[0m values   = [
+                  [32m+[0m[0m "repo:amayabdaniel/bluegrid-devops-task:ref:refs/heads/master",
+                  [32m+[0m[0m "repo:amayabdaniel/bluegrid-devops-task:ref:refs/heads/develop",
+                ]
+              [32m+[0m[0m variable = "token.actions.githubusercontent.com:sub"
+            }
+
+          [32m+[0m[0m principals {
+              [32m+[0m[0m identifiers = [
+                  [32m+[0m[0m (known after apply),
+                ]
+              [32m+[0m[0m type        = "Federated"
+            }
+        }
+    }
+
+[1m  # data.aws_iam_policy_document.github_deploy[0m will be read during apply
+  # (config refers to values not yet known)
+[0m [36m<=[0m[0m data "aws_iam_policy_document" "github_deploy" {
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m json          = (known after apply)
+      [32m+[0m[0m minified_json = (known after apply)
+
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "ssm:SendCommand",
+            ]
+          [32m+[0m[0m effect    = "Allow"
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "arn:aws:ssm:us-east-1::document/AWS-RunShellScript",
+              [32m+[0m[0m (known after apply),
+            ]
+          [32m+[0m[0m sid       = "InvokeShellScriptOnThisHost"
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "ssm:DescribeInstanceInformation",
+              [32m+[0m[0m "ssm:GetCommandInvocation",
+              [32m+[0m[0m "ssm:ListCommandInvocations",
+            ]
+          [32m+[0m[0m effect    = "Allow"
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
+            ]
+          [32m+[0m[0m sid       = "PollCommandResults"
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "ec2:DescribeInstances",
+            ]
+          [32m+[0m[0m effect    = "Allow"
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
+            ]
+          [32m+[0m[0m sid       = "ReadInstance"
+        }
+    }
+
+[1m  # aws_iam_instance_profile.ec2[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_instance_profile" "ec2" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m create_date = (known after apply)
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = (known after apply)
+      [32m+[0m[0m name_prefix = "bluegrid-devops-task-ec2-"
+      [32m+[0m[0m path        = "/"
+      [32m+[0m[0m role        = (known after apply)
+      [32m+[0m[0m tags_all    = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m unique_id   = (known after apply)
+    }
+
+[1m  # aws_iam_openid_connect_provider.github[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_openid_connect_provider" "github" {
+      [32m+[0m[0m arn             = (known after apply)
+      [32m+[0m[0m client_id_list  = [
+          [32m+[0m[0m "sts.amazonaws.com",
+        ]
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m tags_all        = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m thumbprint_list = [
+          [32m+[0m[0m "6938fd4d98bab03faadb97b34396831e3780aea1",
+        ]
+      [32m+[0m[0m url             = "https://token.actions.githubusercontent.com"
+    }
+
+[1m  # aws_iam_policy.github_deploy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "github_deploy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m name_prefix      = "bluegrid-devops-task-gh-deploy-"
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+    }
+
+[1m  # aws_iam_role.ec2[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "ec2" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = (known after apply)
+      [32m+[0m[0m name_prefix           = "bluegrid-devops-task-ec2-"
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role.github_deploy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "github_deploy" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = (known after apply)
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m description           = "Assumed by GitHub Actions CD via OIDC. Scoped to amayabdaniel/bluegrid-devops-task."
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = (known after apply)
+      [32m+[0m[0m name_prefix           = "bluegrid-devops-task-gh-deploy-"
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role_policy_attachment.ec2_ssm_core[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "ec2_ssm_core" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      [32m+[0m[0m role       = (known after apply)
+    }
+
+[1m  # aws_iam_role_policy_attachment.github_deploy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "github_deploy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = (known after apply)
+    }
+
+[1m  # aws_instance.gs[0m will be created
+[0m  [32m+[0m[0m resource "aws_instance" "gs" {
+      [32m+[0m[0m ami                                  = (sensitive value)
+      [32m+[0m[0m arn                                  = (known after apply)
+      [32m+[0m[0m associate_public_ip_address          = true
+      [32m+[0m[0m availability_zone                    = (known after apply)
+      [32m+[0m[0m disable_api_stop                     = (known after apply)
+      [32m+[0m[0m disable_api_termination              = (known after apply)
+      [32m+[0m[0m ebs_optimized                        = false
+      [32m+[0m[0m enable_primary_ipv6                  = (known after apply)
+      [32m+[0m[0m force_destroy                        = false
+      [32m+[0m[0m get_password_data                    = false
+      [32m+[0m[0m host_id                              = (known after apply)
+      [32m+[0m[0m host_resource_group_arn              = (known after apply)
+      [32m+[0m[0m iam_instance_profile                 = (known after apply)
+      [32m+[0m[0m id                                   = (known after apply)
+      [32m+[0m[0m instance_initiated_shutdown_behavior = (known after apply)
+      [32m+[0m[0m instance_lifecycle                   = (known after apply)
+      [32m+[0m[0m instance_state                       = (known after apply)
+      [32m+[0m[0m instance_type                        = "t2.micro"
+      [32m+[0m[0m ipv6_address_count                   = (known after apply)
+      [32m+[0m[0m ipv6_addresses                       = (known after apply)
+      [32m+[0m[0m key_name                             = (known after apply)
+      [32m+[0m[0m monitoring                           = false
+      [32m+[0m[0m outpost_arn                          = (known after apply)
+      [32m+[0m[0m password_data                        = (known after apply)
+      [32m+[0m[0m placement_group                      = (known after apply)
+      [32m+[0m[0m placement_group_id                   = (known after apply)
+      [32m+[0m[0m placement_partition_number           = (known after apply)
+      [32m+[0m[0m primary_network_interface_id         = (known after apply)
+      [32m+[0m[0m private_dns                          = (known after apply)
+      [32m+[0m[0m private_ip                           = (known after apply)
+      [32m+[0m[0m public_dns                           = (known after apply)
+      [32m+[0m[0m public_ip                            = (known after apply)
+      [32m+[0m[0m region                               = "us-east-1"
+      [32m+[0m[0m secondary_private_ips                = (known after apply)
+      [32m+[0m[0m security_groups                      = (known after apply)
+      [32m+[0m[0m source_dest_check                    = true
+      [32m+[0m[0m spot_instance_request_id             = (known after apply)
+      [32m+[0m[0m subnet_id                            = "subnet-0786e406ea271d705"
+      [32m+[0m[0m tags                                 = {
+          [32m+[0m[0m "Name" = "bluegrid-devops-task-host"
+        }
+      [32m+[0m[0m tags_all                             = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Name"        = "bluegrid-devops-task-host"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m tenancy                              = (known after apply)
+      [32m+[0m[0m user_data                            = <<-EOT
+            #!/usr/bin/env bash
+            # cloud-init user-data for the gs-rest-service EC2 host
+            # Idempotent: safe to re-run.
+            set -euo pipefail
+            
+            LOG=/var/log/userdata.log
+            exec > >(tee -a "$LOG") 2>&1
+            echo "[userdata] start $(date -Is)"
+            
+            # -----------------------------------------------------------------------------
+            # OS hygiene: keep packages current, install minimal ops tools
+            # -----------------------------------------------------------------------------
+            dnf -y update
+            dnf -y install docker fail2ban dnf-automatic jq curl-minimal
+            
+            # -----------------------------------------------------------------------------
+            # dnf-automatic: apply security updates daily
+            # -----------------------------------------------------------------------------
+            sed -i 's/^upgrade_type.*/upgrade_type = security/'              /etc/dnf/automatic.conf
+            sed -i 's/^apply_updates.*/apply_updates = yes/'                 /etc/dnf/automatic.conf
+            sed -i 's/^download_updates.*/download_updates = yes/'           /etc/dnf/automatic.conf
+            systemctl enable --now dnf-automatic.timer
+            
+            # -----------------------------------------------------------------------------
+            # Docker: enabled at boot, daemon hardened with userns + log rotation
+            # -----------------------------------------------------------------------------
+            mkdir -p /etc/docker
+            cat >/etc/docker/daemon.json <<'JSON'
+            {
+              "log-driver": "json-file",
+              "log-opts": { "max-size": "10m", "max-file": "5" },
+              "live-restore": true,
+              "no-new-privileges": true,
+              "icc": false,
+              "userland-proxy": false
+            }
+            JSON
+            systemctl enable --now docker
+            
+            # -----------------------------------------------------------------------------
+            # Deploy user: dedicated, no sudo, only docker group. SSH key from Terraform.
+            # -----------------------------------------------------------------------------
+            if ! id deploy >/dev/null 2>&1; then
+              useradd --create-home --shell /bin/bash deploy
+            fi
+            usermod -aG docker deploy
+            mkdir -p /home/deploy/.ssh
+            chmod 700 /home/deploy/.ssh
+            cat >/home/deploy/.ssh/authorized_keys <<'KEY'
+            ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJP5ExtILMv/l0MOLWxRGW2ouY547tPA565baVB4EDnN bluegrid-demo
+            KEY
+            chmod 600 /home/deploy/.ssh/authorized_keys
+            chown -R deploy:deploy /home/deploy/.ssh
+            
+            # Belt-and-braces: ensure deploy has NO sudo entries
+            rm -f /etc/sudoers.d/deploy
+            
+            # -----------------------------------------------------------------------------
+            # Disable ec2-user SSH (prevent the well-known account from being a target)
+            # -----------------------------------------------------------------------------
+            if [ -f /home/ec2-user/.ssh/authorized_keys ]; then
+              : > /home/ec2-user/.ssh/authorized_keys
+            fi
+            usermod -L ec2-user || true
+            
+            # -----------------------------------------------------------------------------
+            # SSH hardening
+            # -----------------------------------------------------------------------------
+            cat >/etc/ssh/sshd_config.d/10-hardening.conf <<'SSHD'
+            Protocol 2
+            PermitRootLogin no
+            PasswordAuthentication no
+            ChallengeResponseAuthentication no
+            KbdInteractiveAuthentication no
+            PubkeyAuthentication yes
+            PermitEmptyPasswords no
+            MaxAuthTries 3
+            LoginGraceTime 30
+            ClientAliveInterval 300
+            ClientAliveCountMax 2
+            AllowUsers deploy
+            X11Forwarding no
+            AllowAgentForwarding no
+            AllowTcpForwarding no
+            PermitTunnel no
+            UsePAM yes
+            KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,sntrup761x25519-sha512@openssh.com
+            Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+            MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
+            SSHD
+            systemctl reload sshd || systemctl restart sshd
+            
+            # -----------------------------------------------------------------------------
+            # fail2ban: block sshd brute force
+            # -----------------------------------------------------------------------------
+            cat >/etc/fail2ban/jail.d/sshd.local <<'JAIL'
+            [sshd]
+            enabled = true
+            port    = ssh
+            maxretry = 3
+            findtime = 10m
+            bantime  = 1h
+            JAIL
+            systemctl enable --now fail2ban
+            
+            # -----------------------------------------------------------------------------
+            # First boot of the app: pull and run the initial image. Subsequent deploys
+            # are driven by the GitHub Actions CD workflow via SSM RunCommand which calls
+            # /usr/local/bin/gs-deploy.sh below.
+            # -----------------------------------------------------------------------------
+            cat >/usr/local/bin/gs-deploy.sh <<'SHELL'
+            #!/usr/bin/env bash
+            # gs-deploy.sh — pull a new image and (re)start the gs-rest-service container.
+            # Called by SSM RunCommand from GitHub Actions, or by hand on the host.
+            set -euo pipefail
+            
+            IMAGE="${1:?usage: gs-deploy.sh <image-ref> [container-port=8080] [host-port=777]}"
+            CPORT="${2:-8080}"
+            HPORT="${3:-777}"
+            NAME="gs-rest-service"
+            
+            echo "[gs-deploy] image=$IMAGE host=$HPORT -> container=$CPORT"
+            
+            # Pull (anonymous works for public GHCR images)
+            docker pull "$IMAGE"
+            
+            # Cycle the container with all hardening flags
+            docker rm -f "$NAME" >/dev/null 2>&1 || true
+            docker run -d \
+              --name "$NAME" \
+              --restart=unless-stopped \
+              --read-only --tmpfs /tmp \
+              --cap-drop=ALL \
+              --security-opt=no-new-privileges \
+              --memory=384m --memory-swap=384m \
+              --pids-limit=200 \
+              --log-driver=json-file --log-opt max-size=10m --log-opt max-file=5 \
+              -p "$HPORT:$CPORT" \
+              "$IMAGE"
+            
+            # Smoke-test
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              if curl -fsS "http://127.0.0.1:$HPORT/greeting" >/dev/null; then
+                echo "[gs-deploy] OK after $i tries"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "[gs-deploy] smoke test FAILED" >&2
+            docker logs --tail 100 "$NAME" >&2 || true
+            exit 1
+            SHELL
+            chmod 755 /usr/local/bin/gs-deploy.sh
+            
+            # Initial deploy of whatever image was set at terraform apply time
+            sudo -u deploy /usr/local/bin/gs-deploy.sh "ghcr.io/amayabdaniel/gs-rest-service:master" "8080" "777" || \
+              echo "[userdata] initial deploy failed (non-fatal; CD workflow will retry)"
+            
+            echo "[userdata] complete $(date -Is)"
+        EOT
+      [32m+[0m[0m user_data_base64                     = (known after apply)
+      [32m+[0m[0m user_data_replace_on_change          = true
+      [32m+[0m[0m vpc_security_group_ids               = (known after apply)
+
+      [32m+[0m[0m capacity_reservation_specification (known after apply)
+
+      [32m+[0m[0m cpu_options (known after apply)
+
+      [32m+[0m[0m ebs_block_device (known after apply)
+
+      [32m+[0m[0m enclave_options (known after apply)
+
+      [32m+[0m[0m ephemeral_block_device (known after apply)
+
+      [32m+[0m[0m instance_market_options (known after apply)
+
+      [32m+[0m[0m maintenance_options (known after apply)
+
+      [32m+[0m[0m metadata_options {
+          [32m+[0m[0m http_endpoint               = "enabled"
+          [32m+[0m[0m http_protocol_ipv6          = "disabled"
+          [32m+[0m[0m http_put_response_hop_limit = 1
+          [32m+[0m[0m http_tokens                 = "required"
+          [32m+[0m[0m instance_metadata_tags      = "enabled"
+        }
+
+      [32m+[0m[0m network_interface (known after apply)
+
+      [32m+[0m[0m primary_network_interface (known after apply)
+
+      [32m+[0m[0m private_dns_name_options (known after apply)
+
+      [32m+[0m[0m root_block_device {
+          [32m+[0m[0m delete_on_termination = true
+          [32m+[0m[0m device_name           = (known after apply)
+          [32m+[0m[0m encrypted             = true
+          [32m+[0m[0m iops                  = (known after apply)
+          [32m+[0m[0m kms_key_id            = (known after apply)
+          [32m+[0m[0m tags                  = {
+              [32m+[0m[0m "Name" = "bluegrid-devops-task-root"
+            }
+          [32m+[0m[0m tags_all              = (known after apply)
+          [32m+[0m[0m throughput            = (known after apply)
+          [32m+[0m[0m volume_id             = (known after apply)
+          [32m+[0m[0m volume_size           = 8
+          [32m+[0m[0m volume_type           = "gp3"
+        }
+
+      [32m+[0m[0m secondary_network_interface (known after apply)
+    }
+
+[1m  # aws_key_pair.deploy[0m will be created
+[0m  [32m+[0m[0m resource "aws_key_pair" "deploy" {
+      [32m+[0m[0m arn             = (known after apply)
+      [32m+[0m[0m fingerprint     = (known after apply)
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m key_name        = (known after apply)
+      [32m+[0m[0m key_name_prefix = "bluegrid-devops-task-"
+      [32m+[0m[0m key_pair_id     = (known after apply)
+      [32m+[0m[0m key_type        = (known after apply)
+      [32m+[0m[0m public_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJP5ExtILMv/l0MOLWxRGW2ouY547tPA565baVB4EDnN bluegrid-demo"
+      [32m+[0m[0m region          = "us-east-1"
+      [32m+[0m[0m tags_all        = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+    }
+
+[1m  # aws_security_group.gs[0m will be created
+[0m  [32m+[0m[0m resource "aws_security_group" "gs" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m description            = "gs-rest-service host: 777 from world, 22 from admin only"
+      [32m+[0m[0m egress                 = (known after apply)
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ingress                = (known after apply)
+      [32m+[0m[0m name                   = "bluegrid-devops-task-sg"
+      [32m+[0m[0m name_prefix            = (known after apply)
+      [32m+[0m[0m owner_id               = (known after apply)
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m revoke_rules_on_delete = false
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m vpc_id                 = "vpc-0bc68732136df3c42"
+    }
+
+[1m  # aws_vpc_security_group_egress_rule.dns_udp[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc_security_group_egress_rule" "dns_udp" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m cidr_ipv4              = "0.0.0.0/0"
+      [32m+[0m[0m description            = "DNS resolution"
+      [32m+[0m[0m from_port              = 53
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ip_protocol            = "udp"
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m security_group_id      = (known after apply)
+      [32m+[0m[0m security_group_rule_id = (known after apply)
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m to_port                = 53
+    }
+
+[1m  # aws_vpc_security_group_egress_rule.https[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc_security_group_egress_rule" "https" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m cidr_ipv4              = "0.0.0.0/0"
+      [32m+[0m[0m description            = "HTTPS to anywhere (image pulls, SSM, Slack, updates)"
+      [32m+[0m[0m from_port              = 443
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ip_protocol            = "tcp"
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m security_group_id      = (known after apply)
+      [32m+[0m[0m security_group_rule_id = (known after apply)
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m to_port                = 443
+    }
+
+[1m  # aws_vpc_security_group_egress_rule.ntp[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc_security_group_egress_rule" "ntp" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m cidr_ipv4              = "0.0.0.0/0"
+      [32m+[0m[0m description            = "NTP for clock sync"
+      [32m+[0m[0m from_port              = 123
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ip_protocol            = "udp"
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m security_group_id      = (known after apply)
+      [32m+[0m[0m security_group_rule_id = (known after apply)
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m to_port                = 123
+    }
+
+[1m  # aws_vpc_security_group_ingress_rule.app_public[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc_security_group_ingress_rule" "app_public" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m cidr_ipv4              = "0.0.0.0/0"
+      [32m+[0m[0m description            = "gs-rest-service public"
+      [32m+[0m[0m from_port              = 777
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ip_protocol            = "tcp"
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m security_group_id      = (known after apply)
+      [32m+[0m[0m security_group_rule_id = (known after apply)
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m to_port                = 777
+    }
+
+[1m  # aws_vpc_security_group_ingress_rule.ssh_admin[0m will be created
+[0m  [32m+[0m[0m resource "aws_vpc_security_group_ingress_rule" "ssh_admin" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m cidr_ipv4              = "186.98.66.197/32"
+      [32m+[0m[0m description            = "SSH from admin only"
+      [32m+[0m[0m from_port              = 22
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ip_protocol            = "tcp"
+      [32m+[0m[0m region                 = "us-east-1"
+      [32m+[0m[0m security_group_id      = (known after apply)
+      [32m+[0m[0m security_group_rule_id = (known after apply)
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Environment" = "demo"
+          [32m+[0m[0m "ManagedBy"   = "terraform"
+          [32m+[0m[0m "Owner"       = "daniel-amaya"
+          [32m+[0m[0m "Project"     = "bluegrid-devops-task"
+          [32m+[0m[0m "Repository"  = "amayabdaniel/bluegrid-devops-task"
+        }
+      [32m+[0m[0m to_port                = 22
+    }
+
+[1mPlan:[0m [0m15 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m github_deploy_role_arn = (known after apply)
+  [32m+[0m[0m instance_id            = (known after apply)
+  [32m+[0m[0m public_dns             = (known after apply)
+  [32m+[0m[0m public_ip              = (known after apply)
+  [32m+[0m[0m security_group_id      = (known after apply)
+  [32m+[0m[0m service_url            = (known after apply)
+  [32m+[0m[0m ssh_command            = (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"

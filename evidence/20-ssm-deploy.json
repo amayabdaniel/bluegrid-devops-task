@@ -1,0 +1,22 @@
+{
+    "CommandId": "ce6fc18d-5f28-4d97-8dfd-b947e41c5632",
+    "InstanceId": "i-067121bcd94ec70c1",
+    "Comment": "initial deploy from laptop",
+    "DocumentName": "AWS-RunShellScript",
+    "DocumentVersion": "$DEFAULT",
+    "PluginName": "aws:runShellScript",
+    "ResponseCode": 0,
+    "ExecutionStartDateTime": "2026-04-22T16:47:33.278Z",
+    "ExecutionElapsedTime": "PT14.206S",
+    "ExecutionEndDateTime": "2026-04-22T16:47:47.278Z",
+    "Status": "Success",
+    "StatusDetails": "Success",
+    "StandardOutputContent": "[gs-deploy] image=ghcr.io/amayabdaniel/gs-rest-service:master host=777 -> container=8080\nmaster: Pulling from amayabdaniel/gs-rest-service\n25f1d6b1951a: Pulling fs layer\n120712a80114: Pulling fs layer\nc4536ca0a51c: Pulling fs layer\nce86ad22b5de: Pulling fs layer\nb0c658708d22: Pulling fs layer\nce86ad22b5de: Waiting\nb0c658708d22: Waiting\n25f1d6b1951a: Verifying Checksum\n25f1d6b1951a: Download complete\n120712a80114: Verifying Checksum\n120712a80114: Download complete\nce86ad22b5de: Verifying Checksum\nce86ad22b5de: Download complete\nc4536ca0a51c: Verifying Checksum\nc4536ca0a51c: Download complete\nb0c658708d22: Verifying Checksum\nb0c658708d22: Download complete\n25f1d6b1951a: Pull complete\n120712a80114: Pull complete\nc4536ca0a51c: Pull complete\nce86ad22b5de: Pull complete\nb0c658708d22: Pull complete\nDigest: sha256:35695db20bf7db02cb52726aa582b90ec10627f1c5eef17d5cc75e936229666e\nStatus: Downloaded newer image for ghcr.io/amayabdaniel/gs-rest-service:master\nghcr.io/amayabdaniel/gs-rest-service:master\nc8c800c2fa8c74e31fdd46583b8a772397756bc9d8247926bfee09bf0b5ff47c\n[gs-deploy] OK after 6 tries\n",
+    "StandardOutputUrl": "",
+    "StandardErrorContent": "curl: (7) Failed to connect to 127.0.0.1 port 777 after 0 ms: Could not connect to server\ncurl: (7) Failed to connect to 127.0.0.1 port 777 after 0 ms: Could not connect to server\ncurl: (7) Failed to connect to 127.0.0.1 port 777 after 0 ms: Could not connect to server\ncurl: (7) Failed to connect to 127.0.0.1 port 777 after 0 ms: Could not connect to server\ncurl: (7) Failed to connect to 127.0.0.1 port 777 after 0 ms: Could not connect to server\n",
+    "StandardErrorUrl": "",
+    "CloudWatchOutputConfig": {
+        "CloudWatchLogGroupName": "",
+        "CloudWatchOutputEnabled": false
+    }
+}

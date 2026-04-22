@@ -1,0 +1,49 @@
+[0m[1maws_key_pair.deploy: Creating...[0m[0m
+[0m[1maws_iam_openid_connect_provider.github: Creating...[0m[0m
+[0m[1maws_iam_role.ec2: Creating...[0m[0m
+[0m[1maws_security_group.gs: Creating...[0m[0m
+[0m[1maws_iam_openid_connect_provider.github: Creation complete after 1s [id=arn:aws:iam::018491521563:oidc-provider/token.actions.githubusercontent.com][0m
+[0m[1mdata.aws_iam_policy_document.github_assume: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.github_assume: Read complete after 0s [id=3080942330][0m
+[0m[1maws_iam_role.github_deploy: Creating...[0m[0m
+[0m[1maws_key_pair.deploy: Creation complete after 1s [id=bluegrid-devops-task-20260422163516118400000001][0m
+[0m[1maws_iam_role.ec2: Creation complete after 1s [id=bluegrid-devops-task-ec2-20260422163516118700000002][0m
+[0m[1maws_iam_role_policy_attachment.ec2_ssm_core: Creating...[0m[0m
+[0m[1maws_iam_instance_profile.ec2: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.ec2_ssm_core: Creation complete after 0s [id=bluegrid-devops-task-ec2-20260422163516118700000002/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1maws_iam_role.github_deploy: Creation complete after 0s [id=bluegrid-devops-task-gh-deploy-20260422163516754700000003][0m
+[0m[1maws_security_group.gs: Creation complete after 3s [id=sg-0309b84ad37145ecb][0m
+[0m[1maws_vpc_security_group_egress_rule.https: Creating...[0m[0m
+[0m[1maws_vpc_security_group_ingress_rule.ssh_admin: Creating...[0m[0m
+[0m[1maws_vpc_security_group_egress_rule.ntp: Creating...[0m[0m
+[0m[1maws_vpc_security_group_ingress_rule.app_public: Creating...[0m[0m
+[0m[1maws_vpc_security_group_egress_rule.dns_udp: Creating...[0m[0m
+[0m[1maws_vpc_security_group_egress_rule.dns_udp: Creation complete after 1s [id=sgr-0281d7c5d0bb6e4bc][0m
+[0m[1maws_vpc_security_group_egress_rule.https: Creation complete after 1s [id=sgr-0a5a289276654009c][0m
+[0m[1maws_vpc_security_group_egress_rule.ntp: Creation complete after 1s [id=sgr-0cdb0b4a86273c5bf][0m
+[0m[1maws_vpc_security_group_ingress_rule.ssh_admin: Creation complete after 1s [id=sgr-05a165f602c6164fb][0m
+[0m[1maws_vpc_security_group_ingress_rule.app_public: Creation complete after 1s [id=sgr-0455aa9c947b07147][0m
+[0m[1maws_iam_instance_profile.ec2: Creation complete after 6s [id=bluegrid-devops-task-ec2-20260422163516986200000004][0m
+[0m[1maws_instance.gs: Creating...[0m[0m
+[0m[1maws_instance.gs: Still creating... [00m10s elapsed][0m[0m
+[0m[1maws_instance.gs: Still creating... [00m20s elapsed][0m[0m
+[0m[1maws_instance.gs: Still creating... [00m30s elapsed][0m[0m
+[0m[1maws_instance.gs: Creation complete after 39s [id=i-067121bcd94ec70c1][0m
+[0m[1mdata.aws_iam_policy_document.github_deploy: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.github_deploy: Read complete after 0s [id=2840533087][0m
+[0m[1maws_iam_policy.github_deploy: Creating...[0m[0m
+[0m[1maws_iam_policy.github_deploy: Creation complete after 1s [id=arn:aws:iam::018491521563:policy/bluegrid-devops-task-gh-deploy-20260422163602299900000006][0m
+[0m[1maws_iam_role_policy_attachment.github_deploy: Creating...[0m[0m
+[0m[1maws_iam_role_policy_attachment.github_deploy: Creation complete after 0s [id=bluegrid-devops-task-gh-deploy-20260422163516754700000003/arn:aws:iam::018491521563:policy/bluegrid-devops-task-gh-deploy-20260422163602299900000006][0m
+[0m[1m[32m
+Apply complete! Resources: 15 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mgithub_deploy_role_arn = "arn:aws:iam::018491521563:role/bluegrid-devops-task-gh-deploy-20260422163516754700000003"
+instance_id = "i-067121bcd94ec70c1"
+public_dns = "ec2-100-26-229-108.compute-1.amazonaws.com"
+public_ip = "100.26.229.108"
+security_group_id = "sg-0309b84ad37145ecb"
+service_url = "http://100.26.229.108:777/greeting"
+ssh_command = "ssh deploy@100.26.229.108"

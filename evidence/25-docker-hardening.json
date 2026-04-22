@@ -1,0 +1,116 @@
+{
+    "Binds": null,
+    "ContainerIDFile": "",
+    "LogConfig": {
+        "Type": "json-file",
+        "Config": {
+            "max-file": "5",
+            "max-size": "10m"
+        }
+    },
+    "NetworkMode": "default",
+    "PortBindings": {
+        "8080/tcp": [
+            {
+                "HostIp": "",
+                "HostPort": "777"
+            }
+        ]
+    },
+    "RestartPolicy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+    },
+    "AutoRemove": false,
+    "VolumeDriver": "",
+    "VolumesFrom": null,
+    "ConsoleSize": [
+        0,
+        0
+    ],
+    "CapAdd": null,
+    "CapDrop": [
+        "ALL"
+    ],
+    "CgroupnsMode": "private",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IpcMode": "private",
+    "Cgroup": "",
+    "Links": null,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyRootfs": true,
+    "SecurityOpt": [
+        "no-new-privileges"
+    ],
+    "Tmpfs": {
+        "/tmp": ""
+    },
+    "UTSMode": "",
+    "UsernsMode": "",
+    "ShmSize": 67108864,
+    "Runtime": "runc",
+    "Isolation": "",
+    "CpuShares": 0,
+    "Memory": 402653184,
+    "NanoCpus": 0,
+    "CgroupParent": "",
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": [],
+    "BlkioDeviceReadBps": [],
+    "BlkioDeviceWriteBps": [],
+    "BlkioDeviceReadIOps": [],
+    "BlkioDeviceWriteIOps": [],
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "Devices": [],
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "MemoryReservation": 0,
+    "MemorySwap": 402653184,
+    "MemorySwappiness": null,
+    "OomKillDisable": null,
+    "PidsLimit": 200,
+    "Ulimits": [
+        {
+            "Name": "nofile",
+            "Hard": 65536,
+            "Soft": 32768
+        }
+    ],
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "IOMaximumIOps": 0,
+    "IOMaximumBandwidth": 0,
+    "MaskedPaths": [
+        "/proc/asound",
+        "/proc/acpi",
+        "/proc/kcore",
+        "/proc/keys",
+        "/proc/latency_stats",
+        "/proc/timer_list",
+        "/proc/timer_stats",
+        "/proc/sched_debug",
+        "/proc/scsi",
+        "/sys/firmware",
+        "/sys/devices/virtual/powercap"
+    ],
+    "ReadonlyPaths": [
+        "/proc/bus",
+        "/proc/fs",
+        "/proc/irq",
+        "/proc/sys",
+        "/proc/sysrq-trigger"
+    ]
+}
+

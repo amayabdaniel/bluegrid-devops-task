@@ -1,0 +1,3 @@
+NAMES             STATUS                   PORTS                   IMAGE
+gs-rest-service   Up 2 minutes (healthy)   0.0.0.0:777->8080/tcp   ghcr.io/amayabdaniel/gs-rest-service:master
+

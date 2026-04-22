@@ -1,0 +1,8 @@
+
+Verification for ghcr.io/amayabdaniel/gs-rest-service:master --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+
+[{"critical":{"identity":{"docker-reference":"ghcr.io/amayabdaniel/gs-rest-service:master"},"image":{"docker-manifest-digest":"sha256:35695db20bf7db02cb52726aa582b90ec10627f1c5eef17d5cc75e936229666e"},"type":"https://sigstore.dev/cosign/sign/v1"},"optional":{}},{"critical":{"identity":{"docker-reference":"ghcr.io/amayabdaniel/gs-rest-service:master"},"image":{"docker-manifest-digest":"sha256:35695db20bf7db02cb52726aa582b90ec10627f1c5eef17d5cc75e936229666e"},"type":"https://spdx.dev/Document"},"optional":{}}]
