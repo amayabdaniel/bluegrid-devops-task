@@ -1,0 +1,8 @@
+# Hadolint config — fail loudly on Dockerfile smells
+failure-threshold: warning
+trustedRegistries:
+  - docker.io
+  - cgr.dev
+  - public.ecr.aws
+  - ghcr.io
+ignored: []

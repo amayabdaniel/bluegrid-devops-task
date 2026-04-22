@@ -1,0 +1,10 @@
+# Copy to terraform.tfvars (gitignored) and fill in real values.
+
+github_repo    = "danielsdab/bluegrid-devops-task"
+admin_cidr     = "203.0.113.42/32"   # your IP from https://checkip.amazonaws.com (CHANGE ME)
+ssh_public_key = "ssh-ed25519 AAAA... your-handle@laptop"
+
+# Optional overrides
+# aws_region    = "us-east-1"
+# instance_type = "t2.micro"
+# image_ref     = "ghcr.io/danielsdab/gs-rest-service:master"

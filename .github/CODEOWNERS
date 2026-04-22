@@ -1,0 +1,12 @@
+# Default owner for everything in the repo
+*       @danielsdab
+
+# CI/CD configuration owners
+/.github/                @danielsdab
+/Dockerfile              @danielsdab
+/infra/                  @danielsdab
+
+# Security-sensitive files require review
+/SECURITY.md             @danielsdab
+/.gitignore              @danielsdab
+/.github/workflows/      @danielsdab

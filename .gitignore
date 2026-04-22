@@ -1,0 +1,97 @@
+# --- Java / Maven ---
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+.mvn/wrapper/maven-wrapper.jar.sha512
+
+# --- IDEs ---
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+
+# --- Python (monitor/) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Terraform ---
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# --- Secrets / credentials (never commit) ---
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+known_hosts
+authorized_keys
+credentials
+aws-credentials
+.aws/
+.docker/config.json
+.kube/config
+gcloud/
+service-account*.json
+serviceAccount*.json
+*.tfvars
+secrets.yml
+secrets.yaml
+*.secret
+*.secret.*
+
+# --- Build / scan artefacts ---
+sbom.spdx.json
+sbom.cyclonedx.json
+trivy-report.*
+checkov-report.*
+hadolint-report.*
+gitleaks-report.*
+.scannerwork/
+
+# --- Local state from monitor ---
+monitor/state.json
+monitor/*.log
+*.log
+logs/

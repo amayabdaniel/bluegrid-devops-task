@@ -1,0 +1,319 @@
+name: ci
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Default to read-only at the workflow level; jobs escalate as needed
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: gs-rest-service
+  REGISTRY: ghcr.io
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Notify Slack that a build has started
+  # ---------------------------------------------------------------------------
+  notify-start:
+    name: Slack notify — build started
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    if: ${{ vars.SLACK_NOTIFY == 'true' }}
+    steps:
+      - name: Harden runner (audit egress)
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Send "build started" to #gs-rest-service-ci
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ vars.SLACK_CI_CHANNEL_ID }}
+            text: ":hammer_and_wrench: *${{ github.repository }}* — build started on `${{ github.ref_name }}` (`${{ github.sha }}`) by ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+
+  # ---------------------------------------------------------------------------
+  # Lint the Dockerfile (cheap; runs in parallel with build)
+  # ---------------------------------------------------------------------------
+  hadolint:
+    name: Dockerfile lint (Hadolint)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v6
+      - uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5 # v3.3.0
+        with:
+          dockerfile: Dockerfile
+          config: .hadolint.yaml
+          failure-threshold: warning
+
+  # ---------------------------------------------------------------------------
+  # Secrets scan with Gitleaks (catches anything that slipped past .gitignore)
+  # ---------------------------------------------------------------------------
+  gitleaks:
+    name: Secrets scan (Gitleaks)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # Build + test the Spring Boot app
+  # ---------------------------------------------------------------------------
+  build-test:
+    name: Build & test (Maven, Java 25)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      checks: write          # for JUnit annotations on commits/PRs
+      pull-requests: write   # for PR comments with test results
+    outputs:
+      jar-name: ${{ steps.locate-jar.outputs.jar-name }}
+    steps:
+      - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v6
+
+      - name: Set up Java 25 (Temurin)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+          cache-dependency-path: app/pom.xml
+
+      - name: Build, run unit tests, package JAR
+        working-directory: app
+        run: ./mvnw -B -e -ntp clean verify
+
+      - name: Locate built JAR
+        id: locate-jar
+        working-directory: app
+        shell: bash
+        run: |
+          shopt -s nullglob
+          jar=""
+          for f in target/gs-rest-service-*.jar; do
+            case "$f" in *.original) continue ;; esac
+            jar="$f"
+            break
+          done
+          if [ -z "$jar" ] || [ ! -f "$jar" ]; then
+            echo "::error::JAR not found under app/target"
+            exit 1
+          fi
+          echo "jar-name=$(basename "$jar")" >> "$GITHUB_OUTPUT"
+          echo "Built: $jar ($(du -h "$jar" | cut -f1))"
+
+      - name: Publish JUnit results
+        if: ${{ always() }}
+        uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
+        with:
+          report_paths: 'app/target/surefire-reports/TEST-*.xml'
+          require_tests: true
+          detailed_summary: true
+          include_passed: true
+          check_name: JUnit (build-test)
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: app/target/gs-rest-service-*.jar
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload Surefire reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: app/target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Build the Docker image, scan with Trivy, generate SBOM, push to GHCR.
+  # GHCR push only runs on master/develop pushes (not PRs from forks).
+  # ---------------------------------------------------------------------------
+  build-image:
+    name: Build, scan & publish image
+    needs: [build-test, hadolint]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write        # push to GHCR
+      id-token: write        # OIDC for cosign keyless signing
+      security-events: write # upload Trivy SARIF to code scanning
+    steps:
+      - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Compute image tags
+        id: tags
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          ref="${GITHUB_REF_NAME//\//-}"
+          full="${REGISTRY}/${{ github.repository_owner }}/${IMAGE_NAME}"
+          # downcase repo owner (GHCR requires lowercase)
+          full_lc="${full,,}"
+          {
+            echo "image=${full_lc}"
+            echo "tag_sha=${full_lc}:${ref}-${short_sha}"
+            echo "tag_branch=${full_lc}:${ref}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build image (load locally for scanning)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          tags: ${{ steps.tags.outputs.tag_sha }}
+          build-args: |
+            APP_VERSION=0.1.0
+            GIT_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Trivy — scan image, fail on CRITICAL
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          image-ref: ${{ steps.tags.outputs.tag_sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+
+      - name: Trivy — full SARIF for code scanning (non-blocking)
+        if: ${{ always() }}
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          image-ref: ${{ steps.tags.outputs.tag_sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: true
+
+      - name: Upload Trivy SARIF to code scanning
+        if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-image
+
+      - name: Generate SBOM (Syft, SPDX JSON)
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          image: ${{ steps.tags.outputs.tag_sha }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: true
+          upload-release-assets: false
+
+      - name: Log in to GHCR
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to GHCR
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          docker tag "${{ steps.tags.outputs.tag_sha }}" "${{ steps.tags.outputs.tag_branch }}"
+          docker push "${{ steps.tags.outputs.tag_sha }}"
+          docker push "${{ steps.tags.outputs.tag_branch }}"
+
+      - name: Install cosign
+        if: ${{ github.event_name == 'push' }}
+        uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
+
+      - name: Sign image (keyless, OIDC) and attest SBOM
+        if: ${{ github.event_name == 'push' }}
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+        run: |
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "${{ steps.tags.outputs.tag_sha }}")"
+          cosign sign --yes "$digest"
+          cosign attest --yes --predicate sbom.spdx.json --type spdxjson "$digest"
+
+  # ---------------------------------------------------------------------------
+  # Final consolidated Slack message
+  # ---------------------------------------------------------------------------
+  notify-end:
+    name: Slack notify — build finished
+    needs: [build-test, build-image, hadolint, gitleaks]
+    if: ${{ always() && vars.SLACK_NOTIFY == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - name: Compose status
+        id: status
+        run: |
+          # Map needs results into a single status string
+          fail=0
+          for s in '${{ needs.build-test.result }}' '${{ needs.build-image.result }}' '${{ needs.hadolint.result }}' '${{ needs.gitleaks.result }}'; do
+            case "$s" in
+              success|skipped) ;;
+              *) fail=1 ;;
+            esac
+          done
+          if [ "$fail" -eq 0 ]; then
+            echo "icon=:white_check_mark:" >> "$GITHUB_OUTPUT"
+            echo "verdict=passed" >> "$GITHUB_OUTPUT"
+          else
+            echo "icon=:x:" >> "$GITHUB_OUTPUT"
+            echo "verdict=failed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send "build finished" + test summary to #gs-rest-service-ci
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ vars.SLACK_CI_CHANNEL_ID }}
+            text: "${{ steps.status.outputs.icon }} *${{ github.repository }}* — build *${{ steps.status.outputs.verdict }}* on `${{ github.ref_name }}` (`${{ github.sha }}`)\n• build-test: `${{ needs.build-test.result }}`\n• build-image (incl. Trivy CRITICAL gate): `${{ needs.build-image.result }}`\n• hadolint: `${{ needs.hadolint.result }}`\n• gitleaks: `${{ needs.gitleaks.result }}`\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run> · <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|Commit>"

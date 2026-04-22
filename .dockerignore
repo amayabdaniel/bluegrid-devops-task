@@ -1,0 +1,42 @@
+# Keep the build context tiny and avoid leaking junk into images
+**/.git
+**/.gitignore
+**/.github
+**/.idea
+**/.vscode
+**/.DS_Store
+**/*.iml
+**/target
+**/build
+**/out
+**/node_modules
+**/.terraform
+**/*.tfstate
+**/*.tfstate.*
+**/.terragrunt-cache
+**/*.tfvars
+**/*.tfvars.json
+
+# never let secrets reach the build context
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.crt
+**/id_rsa*
+**/id_ed25519*
+**/credentials
+**/aws-credentials
+**/.aws
+
+# docs and CI configs are not needed inside the image
+README.md
+RUNBOOK.md
+COSTS.md
+CHAOS.md
+SECURITY.md
+docs/
+infra/
+monitor/
+scripts/
+Makefile
