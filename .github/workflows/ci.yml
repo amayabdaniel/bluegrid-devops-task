@@ -142,7 +142,7 @@ jobs:
           check_name: JUnit (build-test)
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: app-jar
           path: app/target/gs-rest-service-*.jar
@@ -151,7 +151,7 @@ jobs:
 
       - name: Upload Surefire reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: surefire-reports
           path: app/target/surefire-reports/
