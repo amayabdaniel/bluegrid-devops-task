@@ -28,9 +28,9 @@ Track progress in the Actions tab; every step logs to the run.
 
 ```bash
 # From your laptop with AWS creds and terraform state available
-make deploy IMAGE=ghcr.io/danielsdab/gs-rest-service:master-<sha>
+make deploy IMAGE=ghcr.io/amayabdaniel/gs-rest-service:master-<sha>
 # Or, as last resort, via SSH:
-scripts/deploy.sh ghcr.io/danielsdab/gs-rest-service:master-<sha>
+scripts/deploy.sh ghcr.io/amayabdaniel/gs-rest-service:master-<sha>
 ```
 
 `gs-deploy.sh` is idempotent: it kills the old container and smoke-tests the
@@ -41,7 +41,7 @@ already gone, so you either roll forward or fix fast.
 
 ```bash
 # Find the last known-good SHA from GHCR or from journalctl on the host
-make deploy IMAGE=ghcr.io/danielsdab/gs-rest-service:master-<previous-sha>
+make deploy IMAGE=ghcr.io/amayabdaniel/gs-rest-service:master-<previous-sha>
 ```
 
 The image tags are immutable (GHCR default) — rolling back is literally just

@@ -11,7 +11,7 @@
 #   scripts/deploy.sh <image-ref> [host=ec2-...amazonaws.com] [user=deploy]
 #
 # Example:
-#   scripts/deploy.sh ghcr.io/danielsdab/gs-rest-service:master \
+#   scripts/deploy.sh ghcr.io/amayabdaniel/gs-rest-service:master \
 #                     ec2-1-2-3-4.compute-1.amazonaws.com
 #
 # Requires:
@@ -22,7 +22,7 @@ set -euo pipefail
 
 usage() {
   echo "usage: $0 <image-ref> [host] [user=deploy]" >&2
-  echo "  e.g.: $0 ghcr.io/danielsdab/gs-rest-service:master ec2-1-2-3-4.compute-1.amazonaws.com" >&2
+  echo "  e.g.: $0 ghcr.io/amayabdaniel/gs-rest-service:master ec2-1-2-3-4.compute-1.amazonaws.com" >&2
   exit 64
 }
 

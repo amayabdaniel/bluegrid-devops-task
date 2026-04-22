@@ -25,7 +25,7 @@ variable "aws_region" {
 variable "github_repo" {
   description = "GitHub repo in OWNER/REPO form. Used to scope the OIDC trust policy."
   type        = string
-  # Example: "danielsdab/bluegrid-devops-task"
+  # Example: "amayabdaniel/bluegrid-devops-task"
 }
 
 variable "github_deploy_refs" {
@@ -81,6 +81,6 @@ variable "app_port_public" {
 variable "image_ref" {
   description = "Initial image reference to run on the host. The CD workflow updates this on every deploy via SSM."
   type        = string
-  default     = "ghcr.io/danielsdab/gs-rest-service:master"
+  default     = "ghcr.io/amayabdaniel/gs-rest-service:master"
 }
 

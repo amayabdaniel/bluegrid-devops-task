@@ -3,9 +3,9 @@
 > Automated, signed, hardened build + deploy + monitoring for `gs-rest-service`
 > on AWS Free Tier. Submission for the BlueGrid DevOps assessment.
 
-[![CI](https://github.com/danielsdab/bluegrid-devops-task/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
-[![CD](https://github.com/danielsdab/bluegrid-devops-task/actions/workflows/cd.yml/badge.svg)](.github/workflows/cd.yml)
-[![Terraform](https://github.com/danielsdab/bluegrid-devops-task/actions/workflows/terraform.yml/badge.svg)](.github/workflows/terraform.yml)
+[![CI](https://github.com/amayabdaniel/bluegrid-devops-task/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
+[![CD](https://github.com/amayabdaniel/bluegrid-devops-task/actions/workflows/cd.yml/badge.svg)](.github/workflows/cd.yml)
+[![Terraform](https://github.com/amayabdaniel/bluegrid-devops-task/actions/workflows/terraform.yml/badge.svg)](.github/workflows/terraform.yml)
 
 ## Architecture
 

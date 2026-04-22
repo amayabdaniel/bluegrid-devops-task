@@ -1,6 +1,6 @@
 [Unit]
 Description=gs-rest-service availability monitor
-Documentation=https://github.com/danielsdab/bluegrid-devops-task
+Documentation=https://github.com/amayabdaniel/bluegrid-devops-task
 After=network-online.target
 Wants=network-online.target
 
