@@ -1,12 +1,7 @@
-# Default owner for everything in the repo
-*       @amayabdaniel
-
-# CI/CD configuration owners
+*                        @amayabdaniel
 /.github/                @amayabdaniel
 /Dockerfile              @amayabdaniel
 /infra/                  @amayabdaniel
-
-# Security-sensitive files require review
 /SECURITY.md             @amayabdaniel
 /.gitignore              @amayabdaniel
 /.github/workflows/      @amayabdaniel

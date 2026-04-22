@@ -1,70 +1,62 @@
-# CHAOS — prove the monitor actually works
+# Chaos drill
 
-A reviewer can look at the monitor code and *trust* it detects outages. It's
-a lot stronger to **demonstrate** it. This is the exact sequence I run on
-the defence call.
+Prove the monitor detects outages and recoveries.
 
-## The drill
+## Steps
 
 ```bash
-# Terminal 1: tail the monitor logs on the monitor host
+# terminal 1: tail monitor logs
 aws ssm start-session --target <monitor-instance-id>
 journalctl -u gs-rest-monitor.service -f -o cat
 
-# Terminal 2: tail the Slack channel (#gs-rest-service-monitor) in the browser
+# terminal 2: watch #gs-rest-service-monitor (if slack enabled)
 
-# Terminal 3: on the service host, kill the container
+# terminal 3: kill the container on the service host
 aws ssm start-session --target <service-instance-id>
 docker kill gs-rest-service
 
-# Watch:
-#   - Terminal 1 prints `probe ok=false` for the next 2 polls,
-#     then prints `transition from=UP to=DOWN`.
-#   - Slack gets "🚨 <target> is DOWN (HTTP None)".
-#   - Poll cadence backs off (15s -> 22s -> 33s -> ... capped at 120s).
+# expect:
+#   - `probe ok=false` for a couple of polls
+#   - `transition from=UP to=DOWN`
+#   - poll cadence backs off (15s -> 22s -> 33s -> ..., capped at 120s)
 
-# Still on the service host, restart:
-sudo -u deploy /usr/local/bin/gs-deploy.sh ghcr.io/<owner>/gs-rest-service:master
+# restore:
+sudo -u deploy /usr/local/bin/gs-deploy.sh ghcr.io/amayabdaniel/gs-rest-service:master
 
-# Watch:
-#   - Terminal 1 prints `probe ok=true`, then `transition from=DOWN to=UP`.
-#   - Slack gets "✅ <target> is UP (HTTP 200)".
-#   - Poll cadence snaps back to 15s.
+# expect:
+#   - `probe ok=true`, then `transition from=DOWN to=UP`
+#   - poll cadence snaps back to the steady interval
 ```
 
-## Expected timing (tuned for a clean demo)
+## Timing (default settings)
 
-Monitor defaults are `--interval 15 --down-threshold 2 --up-threshold 2`, so:
+`--interval 15 --down-threshold 2 --up-threshold 2`:
 
-- Detection latency (DOWN): ~30 s after the container dies.
-- Notification latency: ~31 s (Slack post is <1 s).
-- Recovery detection (UP): ~30 s after the container is healthy.
-- Total drill length: ~90 s from kill to "UP" in Slack.
+- DOWN detection: ~30s after container dies
+- Notification: ~31s (slack is <1s)
+- UP detection: ~30s after container is healthy
+- Total drill: ~90s
 
-If you need a tighter demo, export `INTERVAL=5` in `/etc/gs-rest-monitor.env`
-and `systemctl restart gs-rest-monitor.service` beforehand.
+For a tighter demo: `INTERVAL=5` in `/etc/gs-rest-monitor.env`, `systemctl restart gs-rest-monitor.service`.
 
-## What the log looks like
+## Log sample
 
 ```
-{"ts":"2026-04-22T10:10:00Z","event":"probe","target":"http://1.2.3.4:777/greeting","ok":true,"state":"UP","http_status":200,"latency_ms":12.3,"run_id":"2026-04-22-abc1234"}
-{"ts":"2026-04-22T10:10:15Z","event":"probe","ok":false,"state":"UP","http_status":null,"latency_ms":3000.0, ...}
-{"ts":"2026-04-22T10:10:30Z","event":"probe","ok":false,"state":"UP","http_status":null,"latency_ms":3000.0, ...}
-{"ts":"2026-04-22T10:10:30Z","event":"transition","from_state":"UP","to_state":"DOWN","http_status":null,"target":"...", ...}
-{"ts":"2026-04-22T10:11:22Z","event":"probe","ok":true,"state":"DOWN","http_status":200,"latency_ms":14.1, ...}
-{"ts":"2026-04-22T10:11:37Z","event":"probe","ok":true,"state":"DOWN","http_status":200,"latency_ms":13.8, ...}
-{"ts":"2026-04-22T10:11:37Z","event":"transition","from_state":"DOWN","to_state":"UP","http_status":200, ...}
+{"ts":"2026-04-22T10:10:00Z","event":"probe","target":"http://1.2.3.4:777/greeting","ok":true,"state":"UP","http_status":200,"latency_ms":12.3}
+{"ts":"2026-04-22T10:10:15Z","event":"probe","ok":false,"state":"UP","http_status":null,"latency_ms":3000.0}
+{"ts":"2026-04-22T10:10:30Z","event":"probe","ok":false,"state":"UP","http_status":null,"latency_ms":3000.0}
+{"ts":"2026-04-22T10:10:30Z","event":"transition","from_state":"UP","to_state":"DOWN","http_status":null}
+{"ts":"2026-04-22T10:11:22Z","event":"probe","ok":true,"state":"DOWN","http_status":200,"latency_ms":14.1}
+{"ts":"2026-04-22T10:11:37Z","event":"probe","ok":true,"state":"DOWN","http_status":200,"latency_ms":13.8}
+{"ts":"2026-04-22T10:11:37Z","event":"transition","from_state":"DOWN","to_state":"UP","http_status":200}
 ```
 
-## Prove the Trivy gate works
-
-A second drill I'll run on the call if time allows:
+## Trivy gate drill
 
 ```bash
-# Add a known-vulnerable package to pom.xml temporarily, push to a branch.
-# Open a draft PR targeting master.
-# Watch the CI run -> `trivy image --severity CRITICAL --exit-code 1` fails the build.
-# The PR cannot merge (branch protection + required check).
+# Add a known-vulnerable package, push to a branch, open a draft PR to master.
+# The CI run fails at `trivy image --severity CRITICAL --exit-code 1`.
+# Branch protection blocks merge.
 ```
 
-This turns the Trivy configuration into a *proven* control, not a configured one.
+Proves the gate, not just its config.

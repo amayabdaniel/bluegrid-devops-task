@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # Keep GitHub Actions (and their pinned SHAs) up to date weekly
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -13,8 +12,32 @@ updates:
       prefix: ci
       include: scope
     labels: [ci, dependencies]
+    ignore:
+      - dependency-name: "aquasecurity/trivy-action"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "gitleaks/gitleaks-action"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "anchore/sbom-action"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "sigstore/cosign-installer"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "step-security/harden-runner"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "slackapi/slack-github-action"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "hadolint/hadolint-action"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "mikepenz/action-junit-report"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "hashicorp/setup-terraform"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "terraform-linters/setup-tflint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "github/codeql-action"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "aws-actions/configure-aws-credentials"
+        update-types: ["version-update:semver-major"]
 
-  # Maven app dependencies
   - package-ecosystem: maven
     directory: /app
     schedule:
@@ -28,11 +51,9 @@ updates:
       include: scope
     labels: [maven, dependencies]
     ignore:
-      # Only allow patch/minor on Spring Boot in automated PRs; majors are reviewed manually
       - dependency-name: "org.springframework.boot:*"
         update-types: ["version-update:semver-major"]
 
-  # Docker base images
   - package-ecosystem: docker
     directory: /
     schedule:
@@ -46,7 +67,6 @@ updates:
       include: scope
     labels: [docker, dependencies]
 
-  # Terraform providers
   - package-ecosystem: terraform
     directory: /infra
     schedule:

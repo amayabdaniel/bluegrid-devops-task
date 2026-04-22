@@ -1,29 +1,17 @@
 #!/usr/bin/env bash
-# cloud-init user-data for the gs-rest-service EC2 host
-# Idempotent: safe to re-run.
 set -euo pipefail
 
-LOG=/var/log/userdata.log
-exec > >(tee -a "$LOG") 2>&1
+exec > >(tee -a /var/log/userdata.log) 2>&1
 echo "[userdata] start $(date -Is)"
 
-# -----------------------------------------------------------------------------
-# OS hygiene: keep packages current, install minimal ops tools
-# -----------------------------------------------------------------------------
 dnf -y update
 dnf -y install docker fail2ban dnf-automatic jq curl-minimal
 
-# -----------------------------------------------------------------------------
-# dnf-automatic: apply security updates daily
-# -----------------------------------------------------------------------------
-sed -i 's/^upgrade_type.*/upgrade_type = security/'              /etc/dnf/automatic.conf
-sed -i 's/^apply_updates.*/apply_updates = yes/'                 /etc/dnf/automatic.conf
-sed -i 's/^download_updates.*/download_updates = yes/'           /etc/dnf/automatic.conf
+sed -i 's/^upgrade_type.*/upgrade_type = security/'    /etc/dnf/automatic.conf
+sed -i 's/^apply_updates.*/apply_updates = yes/'       /etc/dnf/automatic.conf
+sed -i 's/^download_updates.*/download_updates = yes/' /etc/dnf/automatic.conf
 systemctl enable --now dnf-automatic.timer
 
-# -----------------------------------------------------------------------------
-# Docker: enabled at boot, daemon hardened with userns + log rotation
-# -----------------------------------------------------------------------------
 mkdir -p /etc/docker
 cat >/etc/docker/daemon.json <<'JSON'
 {
@@ -37,9 +25,6 @@ cat >/etc/docker/daemon.json <<'JSON'
 JSON
 systemctl enable --now docker
 
-# -----------------------------------------------------------------------------
-# Deploy user: dedicated, no sudo, only docker group. SSH key from Terraform.
-# -----------------------------------------------------------------------------
 if ! id deploy >/dev/null 2>&1; then
   useradd --create-home --shell /bin/bash deploy
 fi
@@ -52,20 +37,13 @@ KEY
 chmod 600 /home/deploy/.ssh/authorized_keys
 chown -R deploy:deploy /home/deploy/.ssh
 
-# Belt-and-braces: ensure deploy has NO sudo entries
 rm -f /etc/sudoers.d/deploy
 
-# -----------------------------------------------------------------------------
-# Disable ec2-user SSH (prevent the well-known account from being a target)
-# -----------------------------------------------------------------------------
 if [ -f /home/ec2-user/.ssh/authorized_keys ]; then
   : > /home/ec2-user/.ssh/authorized_keys
 fi
 usermod -L ec2-user || true
 
-# -----------------------------------------------------------------------------
-# SSH hardening
-# -----------------------------------------------------------------------------
 cat >/etc/ssh/sshd_config.d/10-hardening.conf <<'SSHD'
 Protocol 2
 PermitRootLogin no
@@ -90,9 +68,6 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@op
 SSHD
 systemctl reload sshd || systemctl restart sshd
 
-# -----------------------------------------------------------------------------
-# fail2ban: block sshd brute force
-# -----------------------------------------------------------------------------
 cat >/etc/fail2ban/jail.d/sshd.local <<'JAIL'
 [sshd]
 enabled = true
@@ -103,15 +78,8 @@ bantime  = 1h
 JAIL
 systemctl enable --now fail2ban
 
-# -----------------------------------------------------------------------------
-# First boot of the app: pull and run the initial image. Subsequent deploys
-# are driven by the GitHub Actions CD workflow via SSM RunCommand which calls
-# /usr/local/bin/gs-deploy.sh below.
-# -----------------------------------------------------------------------------
 cat >/usr/local/bin/gs-deploy.sh <<'SHELL'
 #!/usr/bin/env bash
-# gs-deploy.sh — pull a new image and (re)start the gs-rest-service container.
-# Called by SSM RunCommand from GitHub Actions, or by hand on the host.
 set -euo pipefail
 
 IMAGE="$${1:?usage: gs-deploy.sh <image-ref> [container-port=8080] [host-port=777]}"
@@ -119,12 +87,8 @@ CPORT="$${2:-8080}"
 HPORT="$${3:-777}"
 NAME="gs-rest-service"
 
-echo "[gs-deploy] image=$IMAGE host=$HPORT -> container=$CPORT"
-
-# Pull (anonymous works for public GHCR images)
 docker pull "$IMAGE"
 
-# Cycle the container with all hardening flags
 docker rm -f "$NAME" >/dev/null 2>&1 || true
 docker run -d \
   --name "$NAME" \
@@ -138,22 +102,20 @@ docker run -d \
   -p "$HPORT:$CPORT" \
   "$IMAGE"
 
-# Smoke-test
 for i in 1 2 3 4 5 6 7 8 9 10; do
   if curl -fsS "http://127.0.0.1:$HPORT/greeting" >/dev/null; then
-    echo "[gs-deploy] OK after $i tries"
+    echo "[gs-deploy] ok after $i tries"
     exit 0
   fi
   sleep 2
 done
-echo "[gs-deploy] smoke test FAILED" >&2
+echo "[gs-deploy] smoke test failed" >&2
 docker logs --tail 100 "$NAME" >&2 || true
 exit 1
 SHELL
 chmod 755 /usr/local/bin/gs-deploy.sh
 
-# Initial deploy of whatever image was set at terraform apply time
 sudo -u deploy /usr/local/bin/gs-deploy.sh "${image_ref}" "${app_port_internal}" "${app_port_public}" || \
-  echo "[userdata] initial deploy failed (non-fatal; CD workflow will retry)"
+  echo "[userdata] initial deploy failed"
 
-echo "[userdata] complete $(date -Is)"
+echo "[userdata] done $(date -Is)"

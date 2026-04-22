@@ -1,8 +1,5 @@
 name: cd
 
-# Runs after CI succeeds on master. Deploys via OIDC + SSM RunCommand.
-# No static AWS credentials, no SSH from GitHub.
-
 on:
   workflow_run:
     workflows: ["ci"]
@@ -11,13 +8,13 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Image tag to deploy (defaults to current commit's tag from CI)"
+        description: "Image tag to deploy"
         required: false
         type: string
 
 concurrency:
   group: cd-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false  # NEVER cancel a deploy in flight
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -29,14 +26,13 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to EC2 via SSM (OIDC)
+    name: deploy via ssm
     runs-on: ubuntu-24.04
-    # Don't deploy if CI failed
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 15
     permissions:
       contents: read
-      id-token: write   # required to get the OIDC JWT
+      id-token: write
     environment:
       name: production
       url: ${{ steps.smoke.outputs.url }}
@@ -44,32 +40,30 @@ jobs:
       - uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
         with:
           egress-policy: audit
-
       - uses: actions/checkout@v6
-
-      - name: Resolve image reference
+      - name: resolve image
         id: img
+        env:
+          INPUT_TAG: ${{ github.event.inputs.image_tag }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           owner_lc="${GITHUB_REPOSITORY_OWNER,,}"
-          if [ -n "${{ github.event.inputs.image_tag }}" ]; then
-            tag="${{ github.event.inputs.image_tag }}"
-          elif [ -n "${{ github.event.workflow_run.head_sha }}" ]; then
-            tag="master-${${{ github.event.workflow_run.head_sha }}::7}"
+          if [ -n "$INPUT_TAG" ]; then
+            tag="$INPUT_TAG"
+          elif [ -n "$HEAD_SHA" ]; then
+            tag="master-${HEAD_SHA:0:7}"
           else
             tag="master"
           fi
           image="${REGISTRY}/${owner_lc}/${IMAGE_NAME}:${tag}"
           echo "image=${image}" >> "$GITHUB_OUTPUT"
-          echo "Deploying: ${image}"
-
-      - name: Configure AWS credentials (OIDC, no static keys)
+      - name: aws creds via oidc
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           role-session-name: gh-cd-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: SSM RunCommand — deploy on host
+      - name: ssm deploy
         id: ssm
         env:
           INSTANCE_ID: ${{ vars.AWS_INSTANCE_ID }}
@@ -84,30 +78,24 @@ jobs:
             --cloud-watch-output-config "CloudWatchOutputEnabled=false" \
             --query 'Command.CommandId' --output text)
           echo "cmd_id=$cmd_id" >> "$GITHUB_OUTPUT"
-          echo "Command ID: $cmd_id"
-
-          # Poll until terminal
           for _ in $(seq 1 60); do
             status=$(aws ssm get-command-invocation \
               --command-id "$cmd_id" \
               --instance-id "$INSTANCE_ID" \
               --query 'Status' --output text 2>/dev/null || echo "Pending")
             case "$status" in
-              Success) echo "deploy OK"; break ;;
-              Cancelled|TimedOut|Failed) echo "deploy FAILED: $status" >&2; break ;;
+              Success) break ;;
+              Cancelled|TimedOut|Failed) break ;;
             esac
             sleep 5
           done
-
           aws ssm get-command-invocation \
             --command-id "$cmd_id" \
             --instance-id "$INSTANCE_ID" \
             --query '{Status:Status,Stdout:StandardOutputContent,Stderr:StandardErrorContent}' \
             --output json
-
           [ "$status" = "Success" ] || exit 1
-
-      - name: Smoke test public endpoint
+      - name: smoke
         id: smoke
         env:
           PUBLIC_URL: ${{ vars.PUBLIC_SERVICE_URL }}
@@ -117,16 +105,15 @@ jobs:
           echo "url=${url}" >> "$GITHUB_OUTPUT"
           for _ in 1 2 3 4 5 6 7 8 9 10; do
             if body=$(curl -fsS --max-time 5 "$url"); then
-              echo "OK: $body"
-              echo "$body" | grep -q '"content"' || { echo "unexpected body" >&2; exit 1; }
+              echo "$body" | grep -q '"content"' || exit 1
               exit 0
             fi
             sleep 3
           done
-          echo "smoke test FAILED" >&2
           exit 1
-
-      - name: Slack notify (deploy result)
+      # slack: deploy result notification to #gs-rest-service-ci
+      # gated on vars.SLACK_NOTIFY; fires on success or failure
+      - name: slack notify
         if: ${{ always() && vars.SLACK_NOTIFY == 'true' }}
         uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
@@ -134,4 +121,4 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel: ${{ vars.SLACK_CI_CHANNEL_ID }}
-            text: "${{ job.status == 'success' && ':rocket:' || ':boom:' }} *deploy ${{ job.status }}* — ${{ steps.img.outputs.image }}\n<${{ steps.smoke.outputs.url }}|smoke> · <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run>"
+            text: "${{ job.status == 'success' && ':rocket:' || ':boom:' }} *deploy ${{ job.status }}* ${{ steps.img.outputs.image }}\n<${{ steps.smoke.outputs.url }}|smoke> <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run>"

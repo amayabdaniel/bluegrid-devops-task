@@ -1,16 +1,3 @@
-# =============================================================================
-# GitHub Actions OIDC: zero static AWS credentials in GitHub
-# =============================================================================
-# - Creates the OIDC provider for token.actions.githubusercontent.com (idempotent
-#   per account; if you already have one, replace this with `data` lookups).
-# - Defines a deploy role assumable ONLY by this repo, ONLY from the listed
-#   branches, with permissions limited to ssm:SendCommand on this one instance.
-# - The CD workflow assumes this role with `aws-actions/configure-aws-credentials`.
-# =============================================================================
-
-# Thumbprint is no longer required when using GitHub's official OIDC provider
-# (AWS now validates against the well-known IAM trust store). thumbprint_list is
-# kept as required-but-unused for backwards compatibility.
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
@@ -33,11 +20,13 @@ data "aws_iam_policy_document" "github_assume" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Lock the trust to this repo + only the listed refs (branches)
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [for r in var.github_deploy_refs : "repo:${var.github_repo}:ref:${r}"]
+      values = concat(
+        [for r in var.github_deploy_refs : "repo:${var.github_repo}:ref:${r}"],
+        [for e in var.github_deploy_environments : "repo:${var.github_repo}:environment:${e}"],
+      )
     }
   }
 }
@@ -45,12 +34,10 @@ data "aws_iam_policy_document" "github_assume" {
 resource "aws_iam_role" "github_deploy" {
   name_prefix          = "${var.project}-gh-deploy-"
   assume_role_policy   = data.aws_iam_policy_document.github_assume.json
-  description          = "Assumed by GitHub Actions CD via OIDC. Scoped to ${var.github_repo}."
+  description          = "assumed by github actions via oidc, scoped to ${var.github_repo}"
   max_session_duration = 3600
 }
 
-# Minimum permissions: invoke RunShellScript on THIS instance only,
-# read the result, and read instance metadata.
 data "aws_iam_policy_document" "github_deploy" {
   statement {
     sid     = "InvokeShellScriptOnThisHost"

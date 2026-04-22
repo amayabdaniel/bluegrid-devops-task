@@ -1,4 +1,3 @@
-# Hadolint config — fail loudly on Dockerfile smells
 failure-threshold: warning
 trustedRegistries:
   - docker.io
