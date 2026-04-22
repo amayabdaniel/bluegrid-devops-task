@@ -8,7 +8,7 @@ CONTAINER    ?= gs-rest-service
 APP_PORT     ?= 777
 INTERNAL_PORT := 8080
 
-.PHONY: help build run stop logs test-app test-monitor lint lint-fix \
+.PHONY: help build run stop logs test-app lint lint-fix \
         tf-init tf-fmt tf-plan tf-apply tf-destroy tf-validate \
         deploy chaos clean all-checks
 
@@ -41,19 +41,14 @@ logs: ## Tail local container logs
 test-app: ## Run app unit tests in a throwaway container
 	cd app && ./mvnw -B -e -ntp verify
 
-test-monitor: ## Lint + test the monitor
-	cd monitor && ruff check . && pytest -q
-
 lint: ## All local linters
 	hadolint --config .hadolint.yaml Dockerfile
 	actionlint .github/workflows/*.yml
-	shellcheck scripts/*.sh monitor/install.sh
+	shellcheck scripts/*.sh
 	cd infra && terraform fmt -check -recursive && terraform validate && tflint --recursive
-	cd monitor && ruff check .
 
 lint-fix: ## Auto-fix the fixable lints
 	cd infra && terraform fmt -recursive
-	cd monitor && ruff check --fix .
 
 # ----- Terraform -------------------------------------------------------------
 tf-init: ## terraform init
@@ -88,9 +83,9 @@ chaos: ## Kill the local container to verify recovery. See CHAOS.md for the real
 	docker kill $(CONTAINER) && sleep 2 && $(MAKE) run
 
 # ----- Aggregate -------------------------------------------------------------
-all-checks: lint test-monitor ## Everything you can run locally without AWS
+all-checks: lint ## Everything you can run locally without AWS
 	@echo "All local checks green."
 
 clean: stop ## Remove local image and build artifacts
 	-docker rmi $(IMAGE) 2>/dev/null
-	-rm -rf app/target infra/.terraform infra/tfplan monitor/.ruff_cache monitor/.pytest_cache
+	-rm -rf app/target infra/.terraform infra/tfplan

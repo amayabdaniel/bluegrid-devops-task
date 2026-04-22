@@ -37,6 +37,6 @@ CHAOS.md
 SECURITY.md
 docs/
 infra/
-monitor/
 scripts/
+evidence/
 Makefile

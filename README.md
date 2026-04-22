@@ -47,11 +47,7 @@ flowchart LR
 │   ├── main.tf                Core resources
 │   ├── iam_oidc.tf            GitHub OIDC + branch-scoped deploy role
 │   └── userdata.sh.tftpl      Docker hardening, sshd, fail2ban, deploy user
-├── monitor/                   Python 3.13, stdlib-only, systemd-ready
-│   ├── monitor.py             State-aware, latency p50/p95, flap dampening
-│   ├── tests/                 11 pytest cases, no network
-│   ├── systemd/               Unit file with full sandbox (NoNewPrivileges, etc.)
-│   └── install.sh             One-command host install
+├── evidence/                  Live proof captured from AWS (26 files, see evidence/README.md)
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml             Hadolint + Gitleaks + Maven + Trivy (CRITICAL gate) + Cosign + SBOM
@@ -98,8 +94,9 @@ make tf-apply                  # provision EC2 + IAM OIDC role
 # 4. Push. CI builds, scans, signs, pushes to GHCR, and CD deploys via SSM.
 git push origin master
 
-# 5. Install the monitor on the same (or a separate) host
-sudo ./monitor/install.sh
+# 5. Install the monitor (from the other repo)
+git clone https://github.com/amayabdaniel/gs-rest-monitor && cd gs-rest-monitor
+sudo ./install.sh
 ```
 
 ## What the pipeline actually enforces
@@ -147,18 +144,16 @@ The CD pipeline has **zero static AWS credentials**:
   to your `/32`, for human ops fallback. The assessment still requires it;
   we don't use it in the pipeline.
 
-## Monorepo note
+## The two repos
 
-The brief asks for two repos — one for the app, one for the monitor. They're
-bundled here for development simplicity and atomic CI. To split before
-submission:
+Per the brief, the submission is split across two repositories:
 
-```bash
-git subtree split --prefix=monitor -b monitor-only
-# push monitor-only to the second repo
-```
+| Repo | What's in it |
+|---|---|
+| [**amayabdaniel/bluegrid-devops-task**](https://github.com/amayabdaniel/bluegrid-devops-task) *(this one)* | App (`app/`), Dockerfile, Terraform IaC (`infra/`), GitHub Actions (CI + CD + Terraform static analysis), docs (Segment B, SECURITY, RUNBOOK, COSTS, CHAOS), and the live evidence bundle under `evidence/` |
+| [**amayabdaniel/gs-rest-monitor**](https://github.com/amayabdaniel/gs-rest-monitor) | The monitoring tool as its own standalone Python package (Python 3.13, stdlib-only, own CI, own systemd unit). `pip install` from the repo root; `python -m gs_rest_monitor` or the `gs-rest-monitor` console script. |
 
-Both repos' `careers@bluegrid.io` invite goes out the same day.
+Both invites go to `careers@bluegrid.io`.
 
 ## Trade-offs I'd revisit if this were production
 
