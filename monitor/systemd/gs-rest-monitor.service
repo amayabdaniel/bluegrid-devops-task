@@ -11,7 +11,7 @@ Group=monitor
 WorkingDirectory=/opt/gs-rest-monitor
 EnvironmentFile=-/etc/gs-rest-monitor.env
 # Target URL and interval must be in /etc/gs-rest-monitor.env; SLACK_WEBHOOK_URL is optional.
-ExecStart=/opt/gs-rest-monitor/.venv/bin/python -m monitor.monitor \
+ExecStart=/opt/gs-rest-monitor/.venv/bin/python -m gs_rest_monitor \
     --target ${TARGET_URL} \
     --interval ${INTERVAL:-15} \
     --state-file /var/lib/gs-rest-monitor/state.json

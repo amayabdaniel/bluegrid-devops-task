@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from monitor.monitor import (
+from gs_rest_monitor.monitor import (
     UP,
     Config,
     State,
