@@ -1,0 +1,37 @@
+[project]
+name = "gs-rest-monitor"
+version = "0.1.0"
+description = "Availability monitor for the gs-rest-service"
+requires-python = ">=3.13"
+dependencies = []           # stdlib-only runtime
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.7",
+    "mypy>=1.11",
+]
+
+[project.scripts]
+gs-rest-monitor = "monitor.monitor:main"
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "PT"]
+ignore = [
+    "S310",  # we deliberately make outbound HTTP requests
+    "S311",  # random.uniform is for jitter, not crypto
+    "BLE001",# broad `except` is intentional in the monitor (never crash the probe)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S104"]  # asserts are normal in pytest
+"monitor/tests/**" = ["S101", "S104"]  # when linted from repo root
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["monitor/tests"]
+pythonpath = ["."]
