@@ -34,7 +34,7 @@ jobs:
         with:
           egress-policy: audit
       # slack: post build-started message to the ci channel
-      - uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+      - uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c # v3.0.2
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -167,7 +167,7 @@ jobs:
       # posts after mvn verify finishes, regardless of pass/fail, if slack is enabled
       - name: slack notify tests completed
         if: ${{ always() && vars.SLACK_NOTIFY == 'true' }}
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c # v3.0.2
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -293,7 +293,7 @@ jobs:
             echo "verdict=failed" >> "$GITHUB_OUTPUT"
           fi
       # slack: post the consolidated build-finished message
-      - uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+      - uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c # v3.0.2
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
