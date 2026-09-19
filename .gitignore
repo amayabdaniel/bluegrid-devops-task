@@ -45,6 +45,12 @@ htmlcov/
 *.tfstate.*
 *.tfvars
 *.tfvars.json
+# Binary plan files bundle tfstate + provider config inside a ZIP, which means
+# committing one publishes the real AWS account_id, VPC/subnet ids, IAM ARNs
+# and every planned resource attribute (including any `sensitive` value at
+# plan time). Same class as *.tfstate — never in git.
+tfplan
+*.tfplan
 crash.log
 override.tf
 override.tf.json
