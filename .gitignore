@@ -40,7 +40,12 @@ htmlcov/
 
 # --- Terraform ---
 .terraform/
-.terraform.lock.hcl
+# .terraform.lock.hcl is deliberately NOT ignored — it records the exact
+# provider versions and their signed checksums, so it is Terraform's
+# equivalent of package-lock.json / go.sum / Cargo.lock. Committing it is
+# what makes `terraform init` reproducible and integrity-checked; ignoring
+# it lets init resolve a different provider build (or, worse, a swapped
+# one at the same version) with nothing to verify.
 *.tfstate
 *.tfstate.*
 *.tfvars
