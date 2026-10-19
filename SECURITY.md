@@ -93,7 +93,7 @@ One row per asset x STRIDE category.
 7. Branch protection requires status checks but admin can bypass (enforce_admins=false). Fine for this demo; production would set enforce_admins=true plus a break-glass IAM role.
 8. The monitor itself is a single point of failure: if its host dies, DOWN events are missed silently. Fix: run a second monitor on a different AZ / machine, and alert on stale heartbeat from either (a dead-man's switch).
 9. Terraform state is local. On a team this should be an S3 backend with DynamoDB locking. The `backend "s3"` stanza in `versions.tf` is commented out and ready to enable.
-10. The Trivy gate is configured but not proven against a real failure. `scripts/prove-trivy-gate.sh` runs the end-to-end proof.
+10. The Trivy gate is configured but not proven against a real failure in this repo's own history. `scripts/prove-trivy-gate.sh` runs the end-to-end proof and exits 0 only when CI actually blocked the build; it exits 1 if CI passed a knowingly-vulnerable base image (the gate is not blocking) and 2 if no terminal conclusion was observed, so a timeout can never be mistaken for a pass. `make test-scripts` checks that decision table offline, without opening a PR or spending Actions minutes.
 
 ## Verification
 

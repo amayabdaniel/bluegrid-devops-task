@@ -77,7 +77,10 @@ endif
 chaos: ## kill local container and restart
 	docker kill $(CONTAINER) && sleep 2 && $(MAKE) run
 
-all-checks: lint ## local checks (no aws)
+test-scripts: ## decision-table test for the trivy-gate proof (no network, no CI minutes)
+	./scripts/test-prove-trivy-gate.sh
+
+all-checks: lint test-scripts ## local checks (no aws)
 	@echo "ok"
 
 clean: stop ## nuke local artifacts
