@@ -48,7 +48,11 @@ await_gate() {
       echo "GATE DID NOT BLOCK: CI concluded 'success' on a base image carrying known CRITICAL CVEs." >&2
       return "$EXIT_GATE_DID_NOT_BLOCK"
       ;;
-    cancelled | skipped | neutral | stale | action_required)
+    cancelled | skipped | neutral | stale | action_required | startup_failure)
+      # startup_failure is a terminal conclusion where the workflow itself
+      # never started (runner image unavailable, setup step crashed, etc.);
+      # the trivy gate did not get a chance to decide, so polling further
+      # is wasted — the state is terminal and inconclusive.
       echo "inconclusive: CI concluded '$conclusion'; the trivy step never decided." >&2
       return "$EXIT_INCONCLUSIVE"
       ;;
